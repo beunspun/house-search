@@ -12,11 +12,11 @@ button{margin-top:12px;width:100%;font-size:15px;font-weight:700;padding:12px;bo
 <input id="pw" type="password" placeholder="Passcode" autocomplete="off" autocapitalize="none">
 <button id="go">Open</button><div class="err" id="err">Wrong passcode — try again.</div><div class="spin" id="spin">Unlocking…</div></div>
 <script>
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});}
 async function unlock(pw){
  document.getElementById('spin').style.display='block';document.getElementById('err').style.display='none';
  try{
-  const buf=await (await fetch('map.enc',{cache:'force-cache'})).arrayBuffer();
+  const buf=await (await fetch('map.enc',{cache:'no-cache'})).arrayBuffer();
   const b=new Uint8Array(buf),salt=b.slice(0,16),iv=b.slice(16,28),ct=b.slice(28);
   const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
   const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
